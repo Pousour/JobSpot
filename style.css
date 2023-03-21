@@ -1,0 +1,301 @@
+html {
+	font-family:"Montserrat",sans-serif;
+	display:flex;
+	justify-content:center;
+}
+html a {
+	text-decoration:none;
+}
+html a:visited {
+	color:inherit;
+}
+body {
+	margin:0;
+	width:100%;
+	display:flex;
+	flex-direction:column;
+	min-height:100vh;
+}
+main {
+	width:100%;
+	position:relative;
+	margin:0;
+	flex-grow:1;
+	padding:75px 0 0 0;
+	box-sizing:border-box;
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+}
+main > div {
+	width:72vw;
+}
+header {
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	position:fixed;
+	width:100%;
+	background-color:#242F40;
+	color:white;
+	z-index:10;
+}
+h1 {
+	margin:0 0 24px 0;
+	font-size:4vh;
+	color:#242F40;
+}
+p {
+	font-size:1.8vh;
+	color:#242F40;
+}
+header h1,footer h1 {
+	font-family:"Almarai",sans-serif;
+	font-weight:800;
+	color:white;
+}
+header p,footer p {
+	color:white;
+}
+header h1 {
+	margin:16px 0px;
+}
+header h1:hover {
+	cursor:pointer;
+}
+nav {
+	display:flex;
+	align-items:center;
+	width:72%;
+	justify-content:space-between;
+}
+nav a {
+	color:white;
+}
+footer {
+	height:30vh;
+	background-color:#242F40;
+	color:white;
+	display:flex;
+	justify-content:center;
+}
+footer nav {
+	width:48%;
+	flex-wrap:wrap;
+}
+footer h1,footer p,footer ul li {
+	padding:12px 0;
+	margin:0;
+}
+footer ul {
+	list-style:none;
+	padding:0;
+	margin:0;
+}
+input,button {
+	padding:16px 16px;
+	border:2px solid #242F40;
+	border-radius:30px;
+	font-size:16px;
+	width:100%;
+	box-sizing:border-box;
+	font-family:"Montserrat";
+}
+button {
+	width:auto;
+	cursor:pointer;
+}
+#searchResults {
+	display:flex;
+	flex-direction:row;
+	justify-content:center;
+	padding:96px 0;
+	gap:48px;
+	flex-wrap:wrap;
+	width:80vw;
+}
+#searchJobs {
+	position:relative;
+	padding:16px 16px;
+	left:100%;
+	transform:translateX(-100%);
+	background-color:#9BE564;
+	border:none;
+	color:#242F40;
+}
+#searchJobs:hover {
+	background-color:#A8E67B;
+}
+.divOffre {
+	display:flex;
+	flex-direction:column;
+	height:400px;
+	aspect-ratio:1;
+	border:2px solid #242F40;
+	border-radius:30px;
+	position:relative;
+	box-shadow:rgba(0,0,0,0.16) 0px 3px 6px,rgba(0,0,0,0.23) 0px 3px 6px;
+	overflow:hidden;
+}
+@media only screen and (max-width:768px) {
+	.divOffre {
+	height:72vw !important;
+}
+}.titreOffre {
+	padding:20px 20px 0 20px;
+	font-size:1.2em;
+}
+.sousTitre {
+	padding:4px 20px 20px 20px;
+}
+.sousTitre span:last-of-type {
+	color:gray;
+}
+.titreOffre,.lieuOffre,.salaireOffre {
+	margin:0;
+}
+.descOffre {
+	/* 	max-height:280px;
+	*/
+  flex-grow:1;
+	margin:0;
+	padding:0 20px;
+	overflow:auto;
+	white-space:pre-line;
+	font-size:smaller;
+}
+.lieuOffre,.salaireOffre,.nomEntreprise,.sousTitre {
+	font-size:small;
+	margin:0;
+}
+.footerOffre {
+	display:flex;
+	justify-content:space-between;
+	padding:20px;
+	gap:0 20px;
+	align-items:end;
+}
+.salaireOffre {
+	margin:0;
+}
+.lienOffre {
+	margin:0;
+}
+.lienOffre:hover {
+	color:#242F40
+}
+.allTagsDiv {
+	display:flex;
+	flex-basis:auto;
+	gap:24px 24px;
+	margin-bottom:24px;
+}
+.allTagsDiv > div {
+	width:50%;
+	height:fit-content;
+}
+.allTagsDiv div:last-child {
+	position:relative;
+}
+@media (max-width:1024px) {
+	.allTagsDiv {
+	flex-direction:column;
+}
+.allTagsDiv > div {
+	width:100%;
+	height:fit-content;
+}
+}.tag-container-keyword,.tag-container-place {
+	display:flex;
+	flex-wrap:wrap;
+	align-items:center;
+	border:2px solid #242F40;
+	border-radius:15px;
+	box-sizing:border-box;
+	z-index:2;
+	position:relative;
+	background-color:white;
+}
+.tag-container-place {
+	margin:0;
+}
+#tag-input-keyword,#tag-input-place {
+	border:none;
+	width:100%;
+}
+#tag-input-keyword:focus-visible,#tag-input-place:focus-visible {
+	border:none;
+	outline:none;
+}
+.tags-keyword,.tags-place {
+	display:flex;
+	flex-wrap:wrap;
+	box-sizing:border-box;
+}
+.tag-keyword,.tag-place,.tag {
+	background-color:#9BE564;
+	color:#242F40;
+	padding:5px 10px;
+	margin:5px;
+	border-radius:20px;
+	display:flex;
+	align-items:center;
+}
+.tag:hover {
+	background-color:#A8E67B;
+}
+.tags-keyword i,.tags-place i {
+	margin-left:5px;
+	cursor:pointer;
+}
+.li:hover {
+	cursor:pointer;
+}
+.searchParamDiv {
+	height:auto;
+	border-bottom:2px solid #242F40;
+	padding:96px 0;
+}
+#suggestions {
+	list-style-type:none;
+	border-radius:0 0 15px 15px;
+	border:2px solid #242F40;
+	border-top:none;
+	margin:0;
+	padding:0px;
+	display:none;
+	overflow:hidden;
+	position:absolute;
+	width:100%;
+	z-index:1;
+	box-sizing:border-box;
+	transform:translateY(-14px);
+}
+#suggestions li {
+	padding:16px 16px;
+	display:flex;
+	justify-content:space-between;
+	cursor:pointer;
+	background-color:white;
+}
+#suggestions li:first-of-type {
+	height:33.5px;
+	align-items:end;
+}
+#suggestions li:hover {
+	background-color:#EADEDA;
+}
+#suggestions li:nth-child(even) {
+	background-color:#242F40;
+	color:white;
+}
+#suggestions li:nth-child(even):hover {
+	background-color:#334055;
+}
+#apropos {
+	padding:96px 0;
+	border-top:2px solid #242F40;
+}
+#apropos a {
+	font-weight:bold;
+}
