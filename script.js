@@ -1,11 +1,39 @@
 document.addEventListener("DOMContentLoaded", function (event) {
-  const textToken = document.querySelector("#checkTokenMessage");
   const buttonSearch = document.querySelector("#searchJobs");
+  const buttonsPagination = document.querySelectorAll(".pagination .button");
+  const pageNumberElem = document.querySelectorAll(".number");
   const searchText = document.querySelector("#searchResults");
-
   const regex = /https?:\/\/[\w\-\.]+\.[\w\-]+\/[\w\-\.\/\?\%\&\=]*/gi;
 
+  let searchRangeFormatted = "0-8";
+  let searchRange = [];
+  let pageNumber = 0;
+
+  buttonsPagination.forEach(button => {
+    button.addEventListener("click", (e) => {
+      if (e.target.classList.contains("previous") && pageNumber != 0) pageNumber--;
+      else if (e.target.classList.contains("next")) {
+        if (searchText.innerText === "Plus aucune offre trouvée pour cette recherche :'(") return;
+        pageNumber++;
+      }
+      pageNumberElem[0].innerText = pageNumber + 1;
+
+      console.log(pageNumber)
+      searchRange = [0 + 9 * pageNumber, 8 + 9 * pageNumber];
+      searchRangeFormatted = searchRange[0] + "-" + searchRange[1];
+      console.log(searchRangeFormatted)
+      getSearchResults();
+    })
+  })
+
   buttonSearch.addEventListener("click", async () => {
+    pageNumber = 0;
+    pageNumberElem[0].innerText = pageNumber + 1;
+    searchRangeFormatted = "0-8";
+    getSearchResults();
+  });
+
+  async function getSearchResults(){
     const temp = tags1;
     const motsCles = temp.join(",");
     let communes = "";
@@ -15,19 +43,22 @@ document.addEventListener("DOMContentLoaded", function (event) {
       else communes += tags2[i].code + ",";
     }
     const response = await fetch(
-      "/server/searchJobs?motsCles=" + motsCles + "&commune=" + communes
+      "/server/searchJobs?motsCles=" + motsCles + "&commune=" + communes + "&range=" + searchRangeFormatted
     );
+
     const data = await response.json();
     const offres = data.resultats;
     if (!offres) {
-      searchText.innerHTML = "0 offre trouvée";
+      if (pageNumber == 0)
+        searchText.innerHTML = "0 offre trouvée";
+      else
+        searchText.innerHTML = "Plus aucune offre trouvée pour cette recherche :'(";
+
       return;
     }
+
     searchText.innerHTML = "";
     offres.forEach((offre) => {
-      ///////////////
-      /*           console.log(offre) */
-      ///////////////
 
       const divOffre = document.createElement("div");
       const titreOffre = document.createElement("h4");
@@ -111,7 +142,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
       divOffre.append(titreOffre, sousTitre, descOffre, footerOffre);
       searchText.append(divOffre);
     });
-  });
+  }
 
   function getTextOrDefault(text, defaultValue) {
     return text || text === null || text === "" ? text : defaultValue;
@@ -174,60 +205,69 @@ document.addEventListener("DOMContentLoaded", function (event) {
   }
 
   // GESTION DES TAGS DE LIEUX
+  let communes = [];
 
+  // RECHERCHE COMMUNE V2
+  fetch("communes.json")
+    .then((response) => response.json())
+    .then((data) => { communes = data; });
+
+  let communeTrouvee;
   input2.addEventListener("keyup", async () => {
-    let nom = input2.value;
-    if (nom.length < 3) {
+    let inputLieu = input2.value;
+    suggestions.innerHTML = "";
+
+    // Check si code ou nom de ville
+    if (parseInt(inputLieu))
+      communeTrouvee = communes.filter((c) =>
+        c.codePostal.startsWith(inputLieu)
+      );
+    else
+      communeTrouvee = communes.filter((c) =>
+        c.libelle.startsWith(inputLieu.toUpperCase())
+      );
+
+    // Sort dans l'ordre en fonction du code
+    communeTrouvee.sort((a, b) => a.codePostal.localeCompare(b.codePostal));
+
+    // Cree un array dans les duplicats de code communes
+    let uniqueCommunes = [];
+    const seenCodes = new Set();
+    for (const commune of communeTrouvee) {
+      if (!seenCodes.has(commune.code)) {
+        seenCodes.add(commune.code);
+        uniqueCommunes.push(commune);
+      }
+    }
+
+    // On affiche les suggestions si l'utilisateur a rentré plus de 2 caracteres
+    if (inputLieu.length < 3) {
       suggestions.innerHTML = "";
       document.getElementById("suggestions").style.display = "none";
 
       return;
     } else document.getElementById("suggestions").style.display = "block";
 
-    let url;
-
-    // 0 = nom, 1 = codePostal
-    let nomOuCode;
-
-    if (isNaN(nom)) {
-      url = `https://geo.api.gouv.fr/communes?nom=${nom}&fields=departement&boost=population&limit=5'`;
-    } else {
-      if (nom.length == 2) {
-        url = `https://geo.api.gouv.fr/departements/${nom}/communes?boost=population&limit=5`;
-        nomOuCode = 0;
-      } else {
-        while (nom.length != 5) {
-          nom += "0";
-        }
-        url = `https://geo.api.gouv.fr/communes?codePostal=${nom}&boost=population&limit=5`;
-        nomOuCode = 1;
-      }
-    }
-    const response = await fetch(url);
-    const lieux = await response.json();
-    suggestions.innerHTML = "";
-    lieux.forEach((lieu) => {
+    // Pour chaque commune trouvées on affiche une suggestion cliquable
+    uniqueCommunes.forEach((lieu) => {
       const suggestion = document.createElement("li");
       const lieuNom = document.createElement("span");
       const lieuDepartement = document.createElement("span");
-      lieuNom.innerHTML = lieu.nom;
-      if (nomOuCode == 1) lieuDepartement.innerHTML = `${lieu.codesPostaux[0]}`;
-      else lieuDepartement.innerHTML = `${lieu.code}`;
+
+      lieuNom.innerHTML = lieu.libelle.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+      lieuDepartement.innerHTML = lieu.codePostal;
 
       suggestion.append(lieuNom, lieuDepartement);
+
+      // Si on clique sur la suggestion, on sauvegarde le tag dans tags2 et cree l'element cliquable pour le supprimer
       suggestion.addEventListener("click", async (e) => {
         if (tags2.length == 0)
           document.getElementsByClassName("tags-place")[0].style.padding =
             "0 0 8px 8px";
 
-        const communeNom = suggestion.querySelector("span").innerText;
-
-        const url = `https://geo.api.gouv.fr/communes?nom=${communeNom}&fields=departement&boost=population&limit=5`;
-        const response = await fetch(url);
-        const commune = await response.json();
         let tempData = {
-          nom: commune[0].nom,
-          code: commune[0].code,
+          nom: lieu.libelle.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()),
+          code: lieu.code,
         };
         tags2.push(tempData);
 
@@ -236,11 +276,12 @@ document.addEventListener("DOMContentLoaded", function (event) {
         tagEl.innerHTML = `${
           suggestion.querySelector("span").innerText
         } <i class="fa fa-times-circle" aria-hidden="true"></i>`;
+
+
         tagEl.querySelector("i").addEventListener("click", (e) => {
           // Suppression du tag dans le tableau tags2 et dans la div tagsContainer2
           let temp = [];
           let tagText = e.target.parentElement.innerText;
-
           let tagIndex;
 
           for (i = 0; i < tags2.length; i++) {
@@ -261,4 +302,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
       suggestions.appendChild(suggestion);
     });
   });
+
+  getSearchResults();
+
 });
